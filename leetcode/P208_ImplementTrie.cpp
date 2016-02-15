@@ -16,20 +16,17 @@ using namespace std;
 
 class TrieNode {
     
-    friend class Trie;
-    
 public:
     // Initialize your data structure here.
     TrieNode() {
         hasValue = false;
         for (int i=0; i<26; i++) {
-            children.push_back(nullptr);
+            children[i] = NULL;
         }
     }
     
-private:
     bool hasValue;
-    vector<TrieNode *>children;
+    TrieNode* children[26];
 };
 
 class Trie {
