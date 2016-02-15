@@ -10,43 +10,87 @@
 
 #include <vector>
 #include <iostream>
+#include <unordered_set>
 
 using namespace std;
 
 class Solution {
 public:
     void solveSudoku(vector<vector<char>>& board) {
-        
-        int rows[9];
-        int cols[9];
-        int mats[9];
-        
-        for (int i=0; i<9; i++) {
-            rows[i] = 0;
-            cols[i] = 0;
-            mats[i] = 0;
-        }
-        
+        bool success = solve(board);
+        cout << (success ? "True" : "False") << endl;
+    }
+    
+    bool solve(vector<vector<char>>& board){
         for (int i=0; i<9; i++) {
             for (int j=0; j<9; j++) {
                 
                 if (board[i][j] != '.') {
-                    int num = board[i][j] - '0';
-                    
-                    rows[i] |= 1<<num;
-                    cols[j] |= 1<<num;
-                    
-                    int m = toMat(i, j);
-                    mats[m] |= 1<<num;
+                    continue;
                 }
                 
+                for (int k=1; k<10; k++) {
+                    
+                    board[i][j] = (char)'0'+k;
+                    
+                    if (isValid(board, i, j) && solve(board)) {
+                        return true;
+                    }
+                    
+                    board[i][j] = '.';
+                }
+                
+                return false;
             }
         }
         
-        solveSudoku(board, 0, 0, rows, cols, mats);
-        
+        return true;
     }
     
+    bool isValid(vector<vector<char>>&board, int i, int j){
+        
+        unordered_set<char>rows;
+        unordered_set<char>cols;
+        unordered_set<char>mats;
+        
+        //Rows
+        for (int k=0; k<9; k++) {
+            if (rows.find(board[i][k]) != rows.end()) {
+                return false;
+            }
+            if (board[i][k] != '.') {
+                rows.insert(board[i][k]);
+            }
+        }
+        
+        for (int k=0; k<9; k++) {
+            if (cols.find(board[k][j]) != cols.end()) {
+                return false;
+            }
+            if (board[k][j] != '.') {
+                cols.insert(board[k][j]);
+            }
+        }
+        
+        vector<vector<int>>indexes = {{0,1,2},{3,4,5},{6,7,8}};
+        
+        for (int row : indexes[i/3]){
+            for (int col : indexes[j/3]){
+                
+                if (mats.find(board[row][col]) != mats.end()) {
+                    return false;
+                }
+                
+                if (board[row][col] != '.') {
+                    mats.insert(board[row][col]);
+                }
+            }
+        }
+        
+        return true;
+    }
+    
+    /*
     bool solveSudoku(vector<vector<char>>& board, int i, int j, int *rows, int *cols, int *mats){
         
         //Last entry
@@ -136,7 +180,7 @@ public:
     int toMat(int i, int j){
         return 3 * (i / 3) + j / 3;
     }
-    
+     */
 };
 
 int main(int argc, char *argv[]){
