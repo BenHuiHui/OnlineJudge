@@ -12,121 +12,44 @@ using namespace std;
 
 class Solution {
 public:
-    int maxProfit(int k, vector<int>& prices) {
+    int maxProfit(int k, vector<int> &prices) {
+        if (prices.empty())
+            return 0;
+        int ans = 0;
         
-        //Case 2 of best time to buy & sell stocks
-        if (k>=prices.size()/2) {
-            return maxProfit(prices);
-        }
-        
-        int profit[prices.size()][k+1];
-        
-        for (int i=0; i<prices.size(); i++) {
-            for (int j=0; j<=k; j++) {
-                profit[i][j]=0;
-            }
-        }
-        
-        unsigned long totalDays = prices.size();
-        
-        //Precompute max profit from day i to day j
-        int singleProfit[prices.size()][prices.size()];
-        
-        for (int i=0; i<prices.size(); i++) {
-            for (int j=0; j<prices.size(); j++) {
-                singleProfit[i][j]=0;
-            }
-        }
-        
-        for (int i=0; i<totalDays; i++) {
+        //Case 2 can buy/sell a lot of times
+        if (k >= prices.size())
+        {
             
-            int min = prices[i];
-            
-            for (int j=i+1; j<totalDays; j++) {
-                
-                int p = prices[j] - min;
-                if (p < 0) {
-                    p = 0;
-                }
-                
-                singleProfit[i][j] = p;
-                
-                if (min > prices[j]) {
-                    min = prices[j];
+            for (int i = 1; i < prices.size(); ++i) {
+                if (prices[i] - prices[i - 1] > 0) {
+                    ans += prices[i] - prices[i - 1];
                 }
             }
             
-        }
-        
-        /*
-        for (int i=0; i<=k; i++) {
-            profit[0][i] = 0;
-        }
-         */
-        
-        int max = 0;
-        
-        for (int i=0; i<prices.size(); i++) {
+        } else {
             
-            for (int j=1; j<=k; j++) {
-
-                int maxPro = 0;
-
-                for (int k=0; k<=i; k++){
-                    
-                    int p = 0;
-                    
-                    if (k>=1) {
-                        p += profit[k-1][j-1];
-                    }
-                    
-                    p += singleProfit[k][i];
-                    
-                    if (maxPro < p) {
-                        maxPro = p;
-                    }
-                    
-                }
+            //Buy/Sell k times with day i MUST sell
+            vector<int> local(k+1);
+            
+            //At most sell/buy k times
+            vector<int> global(k+1);
+            
+            for (int i = 0; i < prices.size() - 1; ++i) {
+                int increase = prices[i + 1] - prices[i];
                 
-                profit[i][j] = maxPro;
-                
-                if (max < maxPro) {
-                    max = maxPro;
+                for (int j = k; j >= 1; --j) {
+                    local[j] = max(global[j - 1] + max(increase, 0), local[j] + increase);
+                    global[j] = max(global[j], local[j]);
                 }
             }
-            
+            ans = global[k];
         }
-        
-        return max;
-    }
-    
-    int maxProfit(vector<int>&prices){
-        
-        int sum = 0;
-        
-        int lo = 0, hi = 0;
-        
-        while (lo<prices.size() && hi<prices.size()) {
-            
-            while (lo<prices.size()-1 && prices[lo]>=prices[lo+1]) {
-                lo++;
-            }
-            
-            hi = lo+1;
-            
-            while (hi<prices.size()-1 && prices[hi] <= prices[hi+1] ) {
-                hi++;
-            }
-            
-            sum += prices[hi] - prices[lo];
-            
-            lo = hi+1;
-        }
-        
-        return sum;
+        return ans;
     }
     
 };
+
 
 int main(int argc, char* argv[]){
     
