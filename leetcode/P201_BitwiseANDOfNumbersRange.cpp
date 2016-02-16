@@ -17,47 +17,13 @@ class Solution {
 public:
     int rangeBitwiseAnd(int m, int n) {
         
-        vector<int>indexes;
-        
-        int start = m;
-        int index = 0;
-        
-        while (start > 0) {
-            
-            if ((start & 1) > 0) {
-                indexes.push_back(index);
-            }
-            
-            start = start >> 1;
-            index++;
-            
+        if (n == m) {
+            return n;
         }
-        
-        for (int i=m+1; i<=n; i++) {
-            
-            vector<int>newIndexes;
-            
-            for (int j=0; j<indexes.size(); j++) {
-                int index = indexes[j];
-                if ((i&1<<index) > 0) {
-                    newIndexes.push_back(index);
-                }
-            }
-            
-            indexes = newIndexes;
-            
-            if (indexes.size()<=0) {
-                break;
-            }
+        if (n - m == 1) {
+            return n & m;
         }
-        
-        int result = 0;
-        
-        for (int i=0; i<indexes.size(); i++) {
-            result |= 1<<indexes[i];
-        }
-        
-        return result;
+        return rangeBitwiseAnd(m / 2, n / 2) << 1;
     }
 };
 
