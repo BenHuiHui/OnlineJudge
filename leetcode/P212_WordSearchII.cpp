@@ -8,6 +8,12 @@
 
 #include <vector>
 #include <string>
+#include <unordered_set>
+
+/*
+ Improved version: insert target word!!!!
+ Early stop: prefix
+ */
 
 using namespace std;
 
@@ -109,26 +115,37 @@ public:
         
         Trie trie;
         vector<vector<bool>>used;
+        
+        for (int i=0; i<words.size(); i++) {
+            trie.insert(words[i]);
+        }
+        
         for (int i=0; i<board.size(); i++) {
             used.push_back(vector<bool>(board[0].size(), false));
         }
         
         for (int i=0; i<board.size(); i++) {
             for (int j=0; j<board[0].size(); j++) {
-                buildTrie(trie, board, used, i, j, "");
+                searchTrie(trie, board, used, i, j, "", sln);
             }
         }
         
-        for (string word : words){
-            if (trie.search(word)) {
-                sln.push_back(word);
+        
+        //Remove duplicates
+        vector<string>unique;
+        unordered_set<string>contains;
+        
+        for (string word : sln) {
+            if (contains.find(word) == contains.end()) {
+                unique.push_back(word);
+                contains.insert(word);
             }
         }
         
-        return sln;
+        return unique;
     }
     
-    void buildTrie(Trie& trie, vector<vector<char>>& board, vector<vector<bool>>&used, int row, int col, string word){
+    void searchTrie(Trie& trie, vector<vector<char>>& board, vector<vector<bool>>&used, int row, int col, string word, vector<string>&sln){
         
         if (row < 0 || row >= board.size() || col<0 || col>=board[0].size()) {
             return;
@@ -141,13 +158,21 @@ public:
         int rowI[4] = {1, -1, 0, 0};
         int colI[4] = {0, 0, 1, -1};
         
-        used[row][col] = true;
         string newWord = word+board[row][col];
         
-        trie.insert(newWord);
+        if (trie.search(newWord)) {
+            sln.push_back(newWord);
+        }
         
+        if (!trie.startsWith(newWord)) {
+            return;
+        }
+        
+        //trie.insert(newWord);
+        used[row][col] = true;
+
         for (int i=0; i<4; i++) {
-            buildTrie(trie, board, used, row+rowI[i], col+colI[i], newWord);
+            searchTrie(trie, board, used, row+rowI[i], col+colI[i], newWord, sln);
         }
         
         used[row][col] = false;
