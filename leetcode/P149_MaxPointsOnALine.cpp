@@ -6,6 +6,8 @@
 //  Copyright © 2016 Hui Hui. All rights reserved.
 //
 
+//Things to be taken care: 1. duplicates 2. vertical
+
 struct Point {
     int x;
     int y;
