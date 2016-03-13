@@ -72,6 +72,7 @@ public:
     }
 };
 
+/*
 int main(int argc, char *argv[]){
     Solution sln;
     vector<vector<char>>mat;
@@ -82,3 +83,4 @@ int main(int argc, char *argv[]){
     
     cout << sln.maximalSquare(mat);
 }
+*/
